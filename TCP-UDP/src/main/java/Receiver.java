@@ -70,8 +70,8 @@ public class Receiver implements TCP_Connection{
                 int i = 0;
                 while (i <= 100000) {
                     if (!packets.contains(i)) { // Packet Missing?
-                        System.out.println(i);
-                        System.out.println(packets.contains(99000));
+//                        System.out.println(i);
+//                        System.out.println(packets.contains(99000));
                         flag = true;
                         break;
                     }
@@ -80,8 +80,8 @@ public class Receiver implements TCP_Connection{
                 if (flag) {
                     prevAck = i; // send prevAck
                 }
-                System.out.println(packets.contains(seqNo));
-                System.out.println("--------------------------------------------- "+prevAck);
+//                System.out.println(packets.contains(seqNo));
+//                System.out.println("--------------------------------------------- "+prevAck);
                 sendPacket(0);
                 if(prevAck > (dataSize -_MSS)){
                     packets.clear();
