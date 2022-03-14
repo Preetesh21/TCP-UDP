@@ -10,6 +10,8 @@ import java.util.*;
 public class Receiver implements TCP_Connection{
 
     int portNo ;
+    int _MSS, dataSize;
+
     InetAddress address ;
     DatagramSocket receiverSocket;
     DatagramPacket receivePacket;
@@ -20,12 +22,14 @@ public class Receiver implements TCP_Connection{
     byte[] recBuff = new byte[1300];
     byte[] sendBuff = new byte[1300];
 
-    public Receiver () throws UnknownHostException, SocketException {
-        portNo = 1222;
+    public Receiver (int portNo_) throws UnknownHostException, SocketException {
+        portNo = portNo_;
         address = InetAddress.getByName("localhost");
         prevAck = 0;
         receiverSocket = new DatagramSocket(portNo);
         receivePacket = new DatagramPacket(recBuff, recBuff.length);
+        _MSS = 1000;	//Packet can have a max of 1000 bytes
+        dataSize = 100000;	//Total data to transmit is 100000 bytes
     }
 
     @Override
@@ -64,8 +68,10 @@ public class Receiver implements TCP_Connection{
                 Collections.sort(packets);
                 boolean flag = false;
                 int i = 0;
-                while (i < 100000) {
+                while (i <= 100000) {
                     if (!packets.contains(i)) { // Packet Missing?
+                        System.out.println(i);
+                        System.out.println(packets.contains(99000));
                         flag = true;
                         break;
                     }
@@ -74,8 +80,13 @@ public class Receiver implements TCP_Connection{
                 if (flag) {
                     prevAck = i; // send prevAck
                 }
+                System.out.println(packets.contains(seqNo));
+                System.out.println("--------------------------------------------- "+prevAck);
                 sendPacket(0);
-
+                if(prevAck > (dataSize -_MSS)){
+                    packets.clear();
+                    prevAck=0;
+                }
             }
         }catch (Exception e)
         {
@@ -89,7 +100,11 @@ public class Receiver implements TCP_Connection{
     }
 
     public static void main(String[] args) throws UnknownHostException, SocketException {
-        Receiver receiver = new Receiver();
+        int portNo=1222;
+        if (args.length > 0) {
+            portNo = Integer.parseInt(args[1]);
+        }
+        Receiver receiver = new Receiver(portNo);
         receiver.receivePacket(receiver.receiverSocket,receiver.receivePacket);
 
     }
