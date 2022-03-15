@@ -130,8 +130,8 @@ public class Sender implements TCP_Connection{
         sender.sendPacket(sender.prevAck); // Send 1st packet
 
         byte[] receiveData = new byte[1300];
-        while (sender.prevAck < (sender.dataSize - sender._MSS)) { // For last
-            // packet, seqNo + MSS > dataSize
+        while (sender.prevAck < (sender.dataSize - sender._MSS)) { 
+            // For last packet, seqNo + MSS > dataSize
 
             DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
             System.out.println("Waiting for ACK");
@@ -140,17 +140,11 @@ public class Sender implements TCP_Connection{
 
             if (!sender.timerExpired()) {
                 windowSize += (sender._MSS * sender._MSS / windowSize); // increase
-                // window
-                // size
-                // by
-                // (MSS^2/W)
+                // window size by (MSS^2)/Window_size
 
                 for (int i = sender.prevAck; (i + sender._MSS - sender.prevAck) < windowSize;) {
-                    if (!sender.packets.contains(i)) { // if possible
-                        // with the new
-                        // window size,
-                        // send another
-                        // packet
+                    if (!sender.packets.contains(i)) { 
+                        // if possible with the new window size, send another packet
                         sender.sendPacket(i);
                     }
                     i += sender._MSS;
